@@ -1,18 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#FFF9C8">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-    <TextView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/body"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/transparent"
-        android:gravity="top"
-        android:padding="5dp"
-        android:scrollbars="vertical"
-        android:textSize="22sp" />
+    <RelativeLayout
+        android:id="@+id/top_frame"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
 
-</RelativeLayout>
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:padding="5dp"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/imageView1"
+            android:padding="5dp"
+            android:text="User Name"
+            android:textColor="#087CCD" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/bottom_frame"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true" >
+
+        <TextView
+            android:id="@+id/mytv1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="This is my sample text for pinch zoom demo, you can zoom in and out using pinch zoom, thanks"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:scrollbars= "vertical"
+            android:singleLine= "false"
+            android:maxLines="6"
+            />
+
+        <EditText
+            android:id="@+id/mytv"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="This is my sample text for pinch zoom demo, you can zoom in and out using pinch zoom, thanks"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:scrollbars= "vertical"
+            android:inputType="none"
+            android:cursorVisible="false"
+            android:minLines="5"
+            android:background="@drawable/rounded_edittext"
+            android:maxLines="6"
+            />
+
+        <ImageButton
+            android:id="@+id/imButton1"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:scaleType="centerInside"
+            android:adjustViewBounds="true"
+            android:background="@drawable/reader_icon" />
+
+        <ProgressBar
+            android:id="@+id/progressBarToday"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:indeterminate="false"
+            android:max="30"
+            android:progress="29"
+            android:progressDrawable="@drawable/circular_progress_bar" />
+
+    </RelativeLayout>
+</LinearLayout>

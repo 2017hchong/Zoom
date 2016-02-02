@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:Zoom="http://schemas.android.com/apk/res-auto">
+
+    <item android:title="Share" Zoom:showAsAction="always" android:id="@+id/Share"> </item>
+
+
+    <item android:title="Color" Zoom:showAsAction="always" android:id="@+id/a_More" android:icon="@drawable/color_wheel">
+
+
+    <menu>
+
+    <item android:title="Forecolor" Zoom:showAsAction="never" android:id="@+id/forecolor"> </item>
+
+    <item android:title="Background Color" Zoom:showAsAction="never" android:id="@+id/backcolor"> </item>
+
+</menu>
+
+</item>
+
+</menu>

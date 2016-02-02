@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<resources>
+
+    <color name="steel_light_grey">#F9F9F9</color>
+
+    <color name="black">#000000</color>
+
+    <color name="blue_steel">#B0C4DE</color>
+
+    <color name="blue">#087CCD</color>
+
+    <color name="tabcolor">#0B6EC7</color>
+
+    <color name="red">#FF0000</color>
+
+    <color name="green">#00FF00</color>
+
+    <color name="cool_green">#66EF66</color>
+
+</resources>
