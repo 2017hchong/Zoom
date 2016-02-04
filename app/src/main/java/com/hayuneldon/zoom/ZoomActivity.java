@@ -38,21 +38,6 @@ public class ZoomActivity extends Activity  implements GestureDetector.OnGesture
 
     String MODE = "NAVIGATION";
 
-    //Hello
-  /*Modes: {NAVIGATION, READER, VISIBILITY}
-   *
-   *NAVIGATION - Only detect gestures like swipes in left, right, up and down directions.
-   *Navigation mode allows the user to switch between comments.
-   *
-   *READER - Detect gestures to only allow scroll on EditText for very long texts.
-   *Makes it easy to read long texts by locking all other gesture commands in order to
-   *avoid accidental touches and altering of current reading experience.
-   *
-   * VISIBILITY - Only detect pinch in and pinch out to zoom in or out on text.
-   * Visibility mode must be accompanied with a timer to toggle off this mode such as to
-   * avoid resizing text on accidentally touching the screen, which happens a lot on large
-   * amount of texts.
-   * */
 
     Comments comment; //Comments data-object. You can use any of your own data objects as per requirement.
 
