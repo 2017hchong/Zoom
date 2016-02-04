@@ -36,7 +36,8 @@ import android.widget.Toast;
 import java.util.Locale;
 
 /**
- * Created by 2017hchong on 1/4/2016.
+ * Created by Hayun Chong and Eldon Luk
+ * Period 1
  */
 public class ZoomActivity extends Activity  implements GestureDetector.OnGestureListener,GestureDetector.OnDoubleTapListener,TextToSpeech.OnInitListener
 {

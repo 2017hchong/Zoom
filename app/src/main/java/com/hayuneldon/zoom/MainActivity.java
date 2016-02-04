@@ -7,7 +7,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
+/**
+ * Created by Hayun Chong and Eldon Luk
+ * Period 1
+ */
 public class MainActivity extends Activity {
 
     @Override
