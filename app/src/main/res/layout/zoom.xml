@@ -5,10 +5,10 @@
     android:orientation="vertical" >
 
     <RelativeLayout
-        android:id="@+id/top_frame"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:layout_height="52dp"
+        android:orientation="vertical"
+        android:id="@+id/top_frame">
 
         <ImageView
             android:id="@+id/imageView1"
@@ -27,8 +27,16 @@
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/imageView1"
             android:padding="5dp"
-            android:text="User Name"
             android:textColor="#087CCD" />
+
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:id="@+id/button"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:background="@drawable/home"
+            android:padding="20dp" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -39,25 +47,28 @@
         android:descendantFocusability="beforeDescendants"
         android:focusableInTouchMode="true" >
 
-        <TextView
+        <EditText
             android:id="@+id/mytv1"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:text="This is my sample text for pinch zoom demo, you can zoom in and out using pinch zoom, thanks"
+            android:layout_height="fill_parent"
             android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"
-            android:scrollbars= "vertical"
-            android:singleLine= "false"
+            android:scrollbars="vertical"
+            android:inputType="none"
+            android:cursorVisible="false"
+            android:minLines="5"
+            android:background="@drawable/rounded_edittext"
             android:maxLines="6"
-            />
+            android:textSize="12dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="top" />
 
         <EditText
             android:id="@+id/mytv"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:text="This is my sample text for pinch zoom demo, you can zoom in and out using pinch zoom, thanks"
             android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"
             android:scrollbars= "vertical"
@@ -66,7 +77,10 @@
             android:minLines="5"
             android:background="@drawable/rounded_edittext"
             android:maxLines="6"
-            />
+            android:textSize="12dp"
+            android:layout_above="@+id/imButton1"
+            android:layout_alignParentTop="true"
+            android:gravity="top" />
 
         <ImageButton
             android:id="@+id/imButton1"
@@ -93,6 +107,26 @@
             android:max="30"
             android:progress="29"
             android:progressDrawable="@drawable/circular_progress_bar" />
+
+        <EditText
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/textSize"
+            android:text="50"
+            android:layout_alignBottom="@+id/imButton1"
+            android:layout_alignParentStart="true" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Set Size"
+            android:id="@+id/setSize"
+            android:layout_alignTop="@+id/textSize"
+            android:layout_toEndOf="@+id/textSize"
+            android:layout_alignBottom="@+id/textSize" />
 
     </RelativeLayout>
 </LinearLayout>

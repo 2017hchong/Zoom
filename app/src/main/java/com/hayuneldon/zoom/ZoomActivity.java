@@ -2,6 +2,9 @@ package com.hayuneldon.zoom;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
+import android.speech.tts.TextToSpeech;
+import android.support.v7.app.ActionBarActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -21,6 +24,8 @@ import android.view.View;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -28,18 +33,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Locale;
+
 /**
  * Created by 2017hchong on 1/4/2016.
  */
-public class ZoomActivity extends Activity  implements GestureDetector.OnGestureListener,GestureDetector.OnDoubleTapListener
+public class ZoomActivity extends Activity  implements GestureDetector.OnGestureListener,GestureDetector.OnDoubleTapListener,TextToSpeech.OnInitListener
 {
     private static final String DEBUG_TAG = "Gestures";
     private GestureDetectorCompat mDetector;
 
-    String MODE = "NAVIGATION";
-
-
-    Comments comment; //Comments data-object. You can use any of your own data objects as per requirement.
+    String MODE = "READER";
 
     int pos = 0;
 
@@ -54,10 +58,12 @@ public class ZoomActivity extends Activity  implements GestureDetector.OnGesture
     ImageView useriv;
     View readerscreen;
     View titlescreen;
+    EditText textSize;
 
     float mRatio = 1.0f;
     int mBaseDist;
     float mBaseRatio;
+    int size = 50;
 
     private float flingMin = 100;
     private float velocityMin = 100;
@@ -72,12 +78,15 @@ public class ZoomActivity extends Activity  implements GestureDetector.OnGesture
     private ParisCountDownTimer countDownTimer;
     private ProgressBar countdown_progress;
 
+
+    private TextToSpeech tts;
+
     // Called when the activity is first created.
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.zoom);
-
 
         actionBar = getActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
@@ -87,18 +96,10 @@ public class ZoomActivity extends Activity  implements GestureDetector.OnGesture
         titleTV.setSelected(true);
         actionBar.setCustomView(customView);
         actionBar.setDisplayShowCustomEnabled(true);
-        titleTV.setText("Gesture Reader");
+        titleTV.setText("Zoom Reader");
 
-
-        // Instantiate the gesture detector with the
-        // application context and an implementation of
-        // GestureDetector.OnGestureListener
         mDetector = new GestureDetectorCompat(this,this);
-        // Set the gesture detector as the double tap
-        // listener.
         mDetector.setOnDoubleTapListener(this);
-
-        comment = new Comments();
         con = this;
 
         mytv = (TextView) findViewById(R.id.mytv);
@@ -111,54 +112,37 @@ public class ZoomActivity extends Activity  implements GestureDetector.OnGesture
 
         countdown_progress.setVisibility(View.INVISIBLE);
 
-        mytv.setTextSize(mRatio + 26);
-        mytv.setVisibility(View.INVISIBLE);
+        mytv.setTextSize(mRatio + 12);
+        mytv.setVisibility(View.VISIBLE);
 
-        ordinaryTV.setTextSize(mRatio + 26);
-        ordinaryTV.setVisibility(View.VISIBLE);
+        ordinaryTV.setTextSize(mRatio + 12);
+        ordinaryTV.setVisibility(View.INVISIBLE);
+        setColoredText("Paste any block of text to begin", forecolor, backcolor);
 
-        //Dedicated method to switch colors on text which is set as Spannable Text.
-        setColoredText(comment.getCommentData(pos),forecolor,backcolor);
 
-        nametv.setText(comment.getCommentBy(pos));
+        tts = new TextToSpeech(this, this);
 
         imButton = (ImageButton) findViewById(R.id.imButton1);
-        imButton.setBackgroundResource(R.drawable.navigation_icon);
-        imButton.setOnClickListener(new View.OnClickListener()
-        {
+        imButton.setBackgroundResource(R.drawable.reader_icon);
+        imButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
-                if(MODE == "NAVIGATION")//Gesture based Navigation is On
-                {
-                    MODE = "READER";
+            public void onClick(View v) {
 
-                    ordinaryTV.setVisibility(View.INVISIBLE);
-                    mytv.setVisibility(View.VISIBLE);
+                if (tts != null) {
 
-                    imButton.setBackgroundResource(R.drawable.reader_icon);
-                    Toast.makeText(con, "Reader Mode Activated.", Toast.LENGTH_LONG).show();
+                    String text =
+                            mytv.getText().toString();
+                    if (text != null) {
+                        if (!tts.isSpeaking()) {
+                            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                        }
+                    }
                 }
-                else if(MODE == "VISIBILITY")
-                {
-                    MODE = "READER";
 
-                    ordinaryTV.setVisibility(View.INVISIBLE);
-                    mytv.setVisibility(View.VISIBLE);
+                Toast.makeText(con, "Reading Aloud", Toast.LENGTH_LONG).show();
 
-                    imButton.setBackgroundResource(R.drawable.reader_icon);
-                    countdown_progress.setVisibility(View.INVISIBLE);
-                }
-                else
-                {
-                    MODE = "NAVIGATION";
 
-                    ordinaryTV.setVisibility(View.VISIBLE);
-                    mytv.setVisibility(View.INVISIBLE);
 
-                    imButton.setBackgroundResource(R.drawable.navigation_icon);
-                    Toast.makeText(con, "Navigation Mode Activated.", Toast.LENGTH_LONG).show();
-                }
             }
         });
 
@@ -166,43 +150,51 @@ public class ZoomActivity extends Activity  implements GestureDetector.OnGesture
             @Override
             public boolean onLongClick(View v) {
 
-                if(MODE == "VISIBILITY")
-                {
-                    MODE = "READER";
-
-                    ordinaryTV.setVisibility(View.INVISIBLE);
-                    mytv.setVisibility(View.VISIBLE);
-
-                    imButton.setBackgroundResource(R.drawable.reader_icon);
-                    countDownTimer.cancel();
-                    countdown_progress.setVisibility(View.INVISIBLE);
-
-                    //Research on font sizes
-                    float tsize = mytv.getTextSize();
-                    float tmratio = mRatio;
-                    String stats = "Text Size = "+tsize+" and mRatio = "+tmratio;
-                    mytv.setText(stats);
-                }
-                else
-                {
-                    MODE = "VISIBILITY";
-                    imButton.setBackgroundResource(R.drawable.navigation_icon);
-
-                    ordinaryTV.setVisibility(View.VISIBLE);
-                    mytv.setVisibility(View.INVISIBLE);
-
-                    //***Setup Countdown Timer***//
-                    countdown_progress.setVisibility(View.VISIBLE);
-                    countdown_progress.setProgress(countdown_progress.getMax());
-                    countDownTimer = new ParisCountDownTimer(startTime, interval);
-                    countDownTimer.start();
-                    //***Setup Countdown Timer***//
-                }
-
                 return true;
+
+            }
+
+        });
+
+        textSize= (EditText)findViewById(R.id.textSize);
+
+        findViewById(R.id.setSize).setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View view) {
+                        size = Integer.parseInt(textSize.getText().toString());
+
+                        mytv.setTextSize(mRatio + size);
+                        ordinaryTV.setTextSize(mRatio + size);
+                    }
+        });
+
+
+        findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Intent intent1 = new Intent(ZoomActivity.this, MainActivity.class);
+                startActivity(intent1);
             }
         });
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (tts!=null) {
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public void onInit(int code) {
+        if (code == TextToSpeech.SUCCESS) {
+            tts.setLanguage(Locale.getDefault());
+        } else {
+            tts = null;
+            Toast.makeText(this, "Failed to initialize TTS engine.",
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -223,8 +215,8 @@ public class ZoomActivity extends Activity  implements GestureDetector.OnGesture
                     float delta = (getDistance(event) - mBaseDist) / STEP;
                     float multi = (float) Math.pow(2, delta);
                     mRatio = Math.min(1024.0f, Math.max(0.1f, mBaseRatio * multi));
-                    mytv.setTextSize(mRatio + 26);
-                    ordinaryTV.setTextSize(mRatio + 26);
+                    mytv.setTextSize(mRatio + size);
+                    ordinaryTV.setTextSize(mRatio + size);
                 }
 
                 return false;
@@ -244,21 +236,6 @@ public class ZoomActivity extends Activity  implements GestureDetector.OnGesture
         return true;
     }
 
-/*
-* onFling happens to be the most important gesture control available.
-* It returns X,Y coordinates of the first touch event and then the last touch event
-* when the user lifts his/ger finger.
-*
-* We use this X,Y coordinates for calculating the distance and velocity of fling.
-*
-* Accidental flings and touches tend to be of smaller coordinate differences and
-* generally of lower velocity.
-*
-* Adjust the constraints as per your requirement and on device touch experience.
-* You may need to save a log of possible gestures in your first prototype and then
-* judge the flingMin and velocityMin parameters or even velocityMax and flingMax.
-* */
-
     @Override
     public boolean onFling(MotionEvent event1, MotionEvent event2,
                            float velocityX, float velocityY) {
@@ -273,63 +250,16 @@ public class ZoomActivity extends Activity  implements GestureDetector.OnGesture
         float absVelocityX = Math.abs(velocityX);
         float absVelocityY = Math.abs(velocityY);
 
-/*
- * Determining Fling directions and corresponding behavior.
- *
- * I have used a standard English book behavior, where the Comments change
- * as per the pages of a book. Right to left denotes a page turn or Next_Item.
- * Left to right denotes a previous page turn or Previous_Item.
- *
- * Flings should be accompanied by audio cues (like sound of page turning etc)
- * such that the progression or change of data can be affirmed without distracting
- * from a decent reading experience.
- *
- * Flings Up and Down have been left out for the sake of understanding. They too
- * can be used to pull down the topic of discussion or a tool bar can be pulled
- * up from the bottom of the screen as per your requirement.
- *
- * An image tool bar example is available at -
- * http://stackoverflow.com/questions/26695864/how-to-add-a-one-side-border-and-background-into-one-drawable/26696547#26696547
- *
- *
- * */
 
         if(absHDiff>absVDiff && absHDiff>flingMin && absVelocityX>velocityMin) //Horizontal Flings
         {
             if(horizontalDiff>0)
             {
                 //LEFT->RIGHT
-                //Behavior = Show Previous Comment
-
-                if(pos>0)
-                {
-                    pos--;
-                    setColoredText(comment.getCommentData(pos),forecolor,backcolor);
-                    nametv.setText(comment.getCommentBy(pos));
-                }
-                else
-                {
-                    //If first comment is reached then alert the user, if possible even ring a bell
-                    //or some audio cue.
-                    Toast.makeText(con, "Reached first comment.", Toast.LENGTH_LONG).show();
-                }
 
             }
             else
             {
-                //LEFT<-RIGHT
-                //Behavior = Show Next Comment;
-
-                if(pos<comment.numberOfComments()-1)
-                {
-                    pos++;
-                    setColoredText(comment.getCommentData(pos),forecolor,backcolor);
-                    nametv.setText(comment.getCommentBy(pos));
-                }
-                else
-                {
-                    Toast.makeText(con, "No more comments.", Toast.LENGTH_LONG).show();
-                }
 
             }
         }
@@ -338,18 +268,10 @@ public class ZoomActivity extends Activity  implements GestureDetector.OnGesture
             if(verticalDiff>0)
             {
                 //UP->DOWN
-                //Show Discussion Frame in Reader
-
-                Toast.makeText(con, "No behavior defined.", Toast.LENGTH_LONG).show();
             }
             else
             {
                 //DOWN->UP
-                //Hide Discussion Frame from Reader if Visible
-                //Suggestion: Show Comment at Current State such that the user does not
-                //loose his/her place in the list of comments they are reading.
-
-                Toast.makeText(con, "No behavior defined.", Toast.LENGTH_LONG).show();
             }
         }
 
@@ -365,6 +287,7 @@ public class ZoomActivity extends Activity  implements GestureDetector.OnGesture
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                             float distanceY) {
         //Not required here.
+
         return true;
     }
 
@@ -397,17 +320,6 @@ public class ZoomActivity extends Activity  implements GestureDetector.OnGesture
         return true;
     }
 
-/*
-* In the methods below the TextView and the EditText have their UI defined.
-* Each has to be set with the same foreground and background color in order to
-* exhibit a consistent color scheme as set by the user.
-*
-* You may want to persist the color settings made by the user using Shared Preferences.
-* A tutorial on using Shared Preferences can be found here -
-* http://www.coders-hub.com/2013/10/how-to-use-shared-preferences-in-android.html#.VTIk7SGqqko
-*
-* */
-
     private void setColoredText(String fulltext, int forecolor1, int backcolor1) {
         mytv.setText(fulltext, TextView.BufferType.SPANNABLE);
         Spannable str = (Spannable) mytv.getText();
@@ -431,17 +343,6 @@ public class ZoomActivity extends Activity  implements GestureDetector.OnGesture
     }
 
 
-    /*
-    * A little bit of coordinate geometry.
-    * The mathematically inclined would recognize the below formula as the Distance Formula or Pythagorean
-    * Theorem. Distance formula is used to calculate the distance between two points in a coordinate space.
-    *
-    * There are 3-Dimensional, 2-Dimensional and multi-dimensional distance formulas as per the
-    * nature of their coordinate space or environment. While, the Device screen is only 2-Dimensional
-    * and flat the 2D Distance Equation is used.
-    *
-    * More about Distance formula here - http://en.wikipedia.org/wiki/Distance
-    * */
     int getDistance(MotionEvent event)
     {
         int dx = (int) (event.getX(0) - event.getX(1));
@@ -449,15 +350,6 @@ public class ZoomActivity extends Activity  implements GestureDetector.OnGesture
         return (int) (Math.sqrt(dx * dx + dy * dy));
     }
 
-
-  /*
-   * Third Party components built by Piotr Adamus are used here;
-   *
-   * The ColorPicker and ColorPickerDialog.
-   *
-   * More about it here - https://github.com/chiralcode/Android-Color-Picker/
-   *
-   * */
 
     private void showColorPickerDialogDemo(final int inputtype) {
 
@@ -476,6 +368,8 @@ public class ZoomActivity extends Activity  implements GestureDetector.OnGesture
                     backcolor = color;
                     readerscreen.setBackgroundColor(color);
                     titlescreen.setBackgroundColor(color);
+                    mytv.setBackgroundColor(color);
+                    ordinaryTV.setBackgroundColor(color);
                 }
 
                 setColoredText(forecolor, backcolor);
@@ -513,14 +407,6 @@ public class ZoomActivity extends Activity  implements GestureDetector.OnGesture
         }
         return false;
     }
-
-
-
-/*My custom Count down timer which sets the behavior of the circular/ring progress bar
-*and reader mode switching behavior.
-*
-*Circular/Ring progress bar is discussed in this tutorial on my personal blog, being         *trivial to the scope of Coder's Hub.
-*/
 
     public class ParisCountDownTimer extends CountDownTimer
     {
